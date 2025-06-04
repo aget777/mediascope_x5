@@ -1,0 +1,6 @@
+__pycache__/
+config.ipynb
+config.py*
+cred/
+settings.json
+tmp/
