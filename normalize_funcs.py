@@ -230,7 +230,7 @@ def append_custom_columns(df, report, nat_tv_ad_dict=None, media_type='tv'):
     return df
 
 
-# In[8]:
+# In[1]:
 
 
 def getMediaTypeDetail(row, media_type='tv'):
@@ -260,7 +260,7 @@ def getMediaTypeDetail(row, media_type='tv'):
         if  distr=='L' and atid==1:
             return 'tv_reg'
 
-        if (distr=='L' and  atid in (23, 25)) or (distr=='N' and  atid in (5, 23, 24, 25)):
+        if atid in (5, 23, 24, 25, 15):
             return 'tv_spon'
 
         else:

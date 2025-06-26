@@ -1647,24 +1647,7 @@ worksheet - название листа для сохранения
 
 
 google_new_ads_media_invest = {
-'db_cols': {
-    'media_key_id': 't1.media_key_id',
-    'media_type': 't1.media_type_long as media_type',
-    'adId': 't1.adId',
-    'advertiserListName': 't1.advertiserListName',
-    'brandListName': 't1.brandListName',
-    'subbrandListName': 't1.subbrandListName',
-    'modelListName': 't1.modelListName',
-    'articleList2Name': 't1.articleList2Name',
-    'articleList3Name': 't1.articleList3Name',
-    'articleList4Name': 't1.articleList4Name',
-    'adName': 't1.adName',
-   'ad_description': 't1.adNotes as ad_description',
-    'adSloganAudioName': 't1.audioSloganName', 
-    'adSloganVideoName': 't1.videoSloganName',
-    # 'media_type': 't1.media_type_long as media_type',
-    'adFirstIssueDate': 't1.adFirstIssueDate',
-},
+ list(config.google_cols.keys())[0]: config.google_cols['db_cols'],
 
 'query' : """
             from

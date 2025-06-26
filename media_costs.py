@@ -7,6 +7,7 @@
 import requests
 import pandas as pd
 import numpy as np
+from math import ceil
 import os
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -59,7 +60,7 @@ pd.set_option('mode.chained_assignment', None)
 sep_str = '*' * 50
 
 
-# In[3]:
+# In[ ]:
 
 
 """
@@ -76,13 +77,13 @@ def get_mon_num_from_date(curr_date):
     return months_count
 
 
-# In[4]:
+# In[ ]:
 
 
 # get_mon_num_from_date('2025-01-01')
 
 
-# In[5]:
+# In[ ]:
 
 
 # mon_num = 423
@@ -95,13 +96,13 @@ def get_mon_num_from_date(curr_date):
 #     print("Данных за этот месяц нет")
 
 
-# In[6]:
+# In[ ]:
 
 
 # check_data.empty
 
 
-# In[7]:
+# In[ ]:
 
 
 def get_media_costs_report(start_date='', end_date='', media_type='tv', flag='regular', main_filter=False):
@@ -167,10 +168,10 @@ def get_media_costs_report(start_date='', end_date='', media_type='tv', flag='re
 
         print()
         print(sep_str)
-        print(f'Удалем строки из таблицы: media_{media_type}_costs по условию: {cond}')
+        print(f'Удалем строки из таблицы: media_{config.media_type_dict[media_type]}_costs по условию: {cond}')
         print()
 
-        removeRowsFromDB(config.db_name, f'media_{media_type}_costs', cond)
+        removeRowsFromDB(config.db_name, f'media_{config.media_type_dict[media_type]}_costs', cond)
         print()
 
     # считаем кол-во месяцев в периоде
@@ -238,7 +239,7 @@ def get_media_costs_report(start_date='', end_date='', media_type='tv', flag='re
 
 
 
-# In[8]:
+# In[ ]:
 
 
 # start_date='2023-01-01'
@@ -247,7 +248,7 @@ def get_media_costs_report(start_date='', end_date='', media_type='tv', flag='re
 #     get_media_costs_report(start_date=start_date, end_date=end_date, media_type=media_type, flag='first')
 
 
-# In[9]:
+# In[ ]:
 
 
 """
@@ -305,7 +306,7 @@ def get_table_tv_costs(*normalize_lst, media_type, start_date='2023-01-01', mon_
     return df
 
 
-# In[10]:
+# In[ ]:
 
 
 """
@@ -363,7 +364,7 @@ def get_table_radio_costs(*normalize_lst, media_type, start_date='2023-01-01', m
     return df
 
 
-# In[11]:
+# In[ ]:
 
 
 """
@@ -421,7 +422,7 @@ def get_table_outdoor_costs(*normalize_lst, media_type, start_date='2023-01-01',
     return df
 
 
-# In[12]:
+# In[ ]:
 
 
 """
@@ -478,7 +479,7 @@ def get_table_press_costs(*normalize_lst, media_type, start_date='2023-01-01', m
     return df
 
 
-# In[13]:
+# In[ ]:
 
 
 # media_type = 'tv'
@@ -488,7 +489,7 @@ def get_table_press_costs(*normalize_lst, media_type, start_date='2023-01-01', m
 # start_date = '2025-01-01'
 
 
-# In[14]:
+# In[ ]:
 
 
 """
@@ -499,34 +500,37 @@ def get_table_press_costs(*normalize_lst, media_type, start_date='2023-01-01', m
 Таким образом нет необходимости заново обращаться в Медиаскоп - переписываем все на месте
 По итогу - удаляем существующую таблицу в БД и на ее место записываем таблицу с новуми данными
 """
-def update_media_cost(media_type):
+def update_media_cost(start_date='', end_date='', media_type='tv'):
     # для запроса к БД приводим тип медиа к нижнему регистру
     media_type = media_type.lower()
     media_type_long = config.media_type_dict[media_type].lower()
 
-    # получаем минимальную дату из таблицы Фактов
-    query = f"""select min(researchDate) from media_{media_type_long}_costs"""
-    # в ответ от БД приходит датаФрейм, поэтому добавляем iloc, чтобы получить строку
-    start_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
+    if not start_date:
+        # получаем минимальную дату из таблицы Фактов
+        query = f"""select min(researchDate) from media_{media_type_long}_costs"""
+        # в ответ от БД приходит датаФрейм, поэтому добавляем iloc, чтобы получить строку
+        start_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d').date()
 
-    # получаем последнюю дату из таблицы Фактов
-    query = f"""select max(researchDate) from media_{media_type_long}_costs"""
-    end_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
+    if not end_date:
+        # получаем последнюю дату из таблицы Фактов
+        query = f"""select max(researchDate) from media_{media_type_long}_costs"""
+        end_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d').date()
 
     # считаем кол-во дней в периоде
     # каждый день мы будем забирать по отдельности и записывать его в БД
     count_days = (end_date - start_date).days
+    count_months = ceil(count_days/30)
     print()
-    print(f'Загружаем отчет за период {start_date} - {end_date}. Общее количество дней: {count_days+1}')
+    print(f'Загружаем отчет за период {start_date} - {end_date}. Общее количество месяцев: {count_months+1}')
     print(sep_str)
     print()
 
      # проходимся по общему количеству дней
-    for i in range(count_days+1):
+    for i in range(count_months):
         # формируем отдельную дату для загрузки
-        cur_date = str(start_date + relativedelta(days=i))
+        cur_date = str(start_date + relativedelta(months=i))
 
         # Формируем запрос к БД - для всех таблиц расходов Медиаинвестиции поля одинкаовые
         query = f""" select adId as vid, cid, adDistributionType, mon_num as mon, from_mon,  from_cid, estat, 
@@ -565,30 +569,10 @@ def update_media_cost(media_type):
         print(f'Удалем строки из таблицы: {table_name} по условию: {cond}')
         print()
         # удаляем данные за этот день из БД
-        # removeRowsFromDB(config.db_name, table_name, cond)
+        removeRowsFromDB(config.db_name, table_name, cond)
 
         # заливаем новую
-        # downloadTableToDB(config.db_name, table_name, df)
-        if count_days==5:
-            break
-
-
-# In[ ]:
-
-
-
-
-
-# In[17]:
-
-
-
-
-
-# In[ ]:
-
-
-
+        downloadTableToDB(config.db_name, table_name, df)
 
 
 # In[ ]:

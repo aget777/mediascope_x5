@@ -76,7 +76,7 @@ def create_reg_tv_tables():
     createDBTable(config.db_name, config_reg_tv.reg_tv_simple , config_reg_tv.reg_tv_simple_vars_list, flag='create')
     createDBTable(config.db_name, config_reg_tv.reg_tv_buying , config_reg_tv.reg_tv_buying_vars_list, flag='create')
     # создаем пустую таблицу-справочник объявлений
-    createDBTable(config.db_name, config_reg_tv.reg_tv_ad_dict , config_reg_tv.reg_tv_ad_dict_vars_list, flag='create')
+    createDBTable(config.db_name, config_reg_tv.reg_tv_ad_dict , config_reg_tv.reg_tv_ad_dict_vars_list, flag='drop')
 
 
 # In[ ]:
