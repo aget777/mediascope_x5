@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[3]:
 
 
 # добавляем библиотеки для работы с ТВ индексом
@@ -68,24 +68,7 @@ db_name = config.db_name
 # In[2]:
 
 
-def create_nat_tv_tables():
-    # специально не стал делать цикл, чтобы явно показать, какие именно создаем таблицы
-    createDBTable(config.db_name, config_tv_index.nat_tv_simple , config_tv_index.nat_tv_simple_vars_list, flag='create')
-    createDBTable(config.db_name, config_tv_index.nat_tv_buying , config_tv_index.nat_tv_buying_vars_list, flag='create')
-    # создаем пустую таблицу-справочник объявлений
-    createDBTable(config.db_name, config_tv_index.nat_tv_ad_dict , config_tv_index.nat_tv_ad_dict_vars_list, flag='create')
-    # создаем и заполняем данными словари по умолчанию
-    download_tv_index_default_dicts()
 
-    # создаем пустые словари справочников через цикл
-    # забираем из файла create_dicts - словарь, где 
-    # ключ - это название поля из отчета Simpe(для дальнейшего удобства так сделано)
-    # значение - это список, который содержит:
-    # [0] - название таблицы в БД
-    # [1] - список полей с типами данных для БД
-    # [2] - список полей с целочисленными значениями для нормализации
-    for key, value in config_tv_index.tv_index_dicts.items():
-        createDBTable(config.db_name, value[0] , value[1], flag='create')
 
 
 # In[3]:
@@ -107,7 +90,24 @@ sep_str = '*' * 50
 # In[ ]:
 
 
+def create_nat_tv_tables():
+    # специально не стал делать цикл, чтобы явно показать, какие именно создаем таблицы
+    createDBTable(config.db_name, config_tv_index.nat_tv_simple , config_tv_index.nat_tv_simple_vars_list, flag='create')
+    createDBTable(config.db_name, config_tv_index.nat_tv_buying , config_tv_index.nat_tv_buying_vars_list, flag='create')
+    # создаем пустую таблицу-справочник объявлений
+    createDBTable(config.db_name, config_tv_index.nat_tv_ad_dict , config_tv_index.nat_tv_ad_dict_vars_list, flag='drop')
+    # создаем и заполняем данными словари по умолчанию
+    download_tv_index_default_dicts()
 
+    # создаем пустые словари справочников через цикл
+    # забираем из файла create_dicts - словарь, где 
+    # ключ - это название поля из отчета Simpe(для дальнейшего удобства так сделано)
+    # значение - это список, который содержит:
+    # [0] - название таблицы в БД
+    # [1] - список полей с типами данных для БД
+    # [2] - список полей с целочисленными значениями для нормализации
+    for key, value in config_tv_index.tv_index_dicts.items():
+        createDBTable(config.db_name, value[0] , value[1], flag='drop')
 
 
 # In[4]:
@@ -436,7 +436,7 @@ def get_nat_tv_buying_report(ad_filter=None, weekday_filter=None, date_filter=No
 
 
 
-# In[26]:
+# In[1]:
 
 
 """
@@ -447,16 +447,18 @@ def get_nat_tv_buying_report(ad_filter=None, weekday_filter=None, date_filter=No
 Таким образом нет необходимости заново обращаться в ТВ индекс - переписываем все на месте
 По итогу - удаляем существующую таблицу в БД и на ее место записываем таблицу с новуми данными
 """
-def update_nat_tv_fact(report='buying'):
+def update_nat_tv_fact(start_date='', end_date='', report='buying'):
+    if not start_date:
     # получаем минимальную дату из таблицы Фактов
-    query = f"""select min(researchDate) from nat_tv_{report}"""
-    # в ответ от БД приходит датаФрейм, поэтому добавляем iloc, чтобы получить строку
-    start_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
+        query = f"""select min(researchDate) from nat_tv_{report}"""
+        # в ответ от БД приходит датаФрейм, поэтому добавляем iloc, чтобы получить строку
+        start_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
     start_date = datetime.strptime(str(start_date), '%Y-%m-%d').date()
 
-    # получаем последнюю дату из таблицы Фактов
-    query = f"""select max(researchDate) from nat_tv_{report}"""
-    end_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
+    if not end_date:
+        # получаем последнюю дату из таблицы Фактов
+        query = f"""select max(researchDate) from nat_tv_{report}"""
+        end_date = get_mssql_table(config.db_name, query=query).iloc[0][0]
     end_date = datetime.strptime(str(end_date), '%Y-%m-%d').date()
 
     # считаем кол-во дней в периоде
@@ -534,7 +536,7 @@ def update_nat_tv_fact(report='buying'):
 
 
 
-# In[ ]:
+# In[14]:
 
 
 

@@ -100,7 +100,7 @@ def dropTable(db_name, table_name):
 
     sql = f"""IF EXISTS(SELECT TOP(1)*
               FROM   [dbo].{table_name})
-      DROP TABLE [dbo].{table_name}"""
+      TRUNCATE TABLE [dbo].{table_name}"""
 
     try:
         cursor.execute(sql)
@@ -149,7 +149,7 @@ def removeRowsFromDB(db_name, table_name, cond):
 
 
 
-# In[15]:
+# In[6]:
 
 
 """
@@ -183,7 +183,7 @@ def createView(db_name, table_name, cond):
 
 
 
-# In[6]:
+# In[7]:
 
 
 """
@@ -237,7 +237,7 @@ def createDBTable(db_name, table_name, vars_list, flag='create'):
     print(f'Пустая таблица {table_name} успешно создана в БД {db_name}')
 
 
-# In[7]:
+# In[8]:
 
 
 """
@@ -298,7 +298,7 @@ def downloadTableToDB(db_name, table_name, df):
     print()
 
 
-# In[8]:
+# In[9]:
 
 
 """
@@ -334,7 +334,7 @@ def get_mssql_table(db_name, table_name='', query='', conn_lst=None):
 
 
 
-# In[9]:
+# In[10]:
 
 
 """
@@ -355,7 +355,7 @@ def get_mssql_pyodbc_connection(db_name, server=config.host_mssql, port=config.p
         print('Что-то пошло не так')
 
 
-# In[10]:
+# In[11]:
 
 
 """
@@ -385,6 +385,22 @@ def get_mssql_russian_chars(db_name, table_name='', query='', conn_lst=None):
     return df
 
 
+# In[21]:
+
+
+"""
+Получаем название всех Баз данных на сервере MSSQL
+"""
+def get_mssql_all_db_names(db_name=config.db_name):
+    conn = get_mssql_pyodbc_connection(db_name)
+    query = "select name FROM sys.databases;"
+    df = pd.read_sql(query, conn)
+
+    print()
+    print('Название всех Баз данных получены')
+    return df
+
+
 # In[ ]:
 
 
@@ -397,7 +413,19 @@ def get_mssql_russian_chars(db_name, table_name='', query='', conn_lst=None):
 
 
 
-# In[11]:
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[12]:
 
 
 """
@@ -421,7 +449,7 @@ def get_mysql_connection(db_name):
 
 
 
-# In[12]:
+# In[13]:
 
 
 """
@@ -439,7 +467,7 @@ def get_mysql_full_dict_table(db_name, table_name):
     return df
 
 
-# In[14]:
+# In[ ]:
 
 
 

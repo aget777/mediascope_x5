@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import warnings
@@ -25,7 +25,7 @@ from db_funcs import createDBTable, downloadTableToDB, get_mssql_table, get_mssq
 db_name = config.db_name
 
 
-# In[ ]:
+# In[2]:
 
 
 # Включаем отображение всех колонок
@@ -53,13 +53,13 @@ sep_str = '*' * 50
 
 
 
-# In[ ]:
+# In[12]:
 
 
 
 
 
-# In[ ]:
+# In[3]:
 
 
 """
@@ -81,7 +81,7 @@ def create_adex_tables():
     for key, value in config_media_costs.adex_defult_dicts.items():
         table_name = value[0]
         vars_list = value[1]
-        createDBTable(config.db_name, table_name, vars_list, flag='create')
+        createDBTable(config.db_name, table_name, vars_list, flag='drop')
 
 # создаем пустые справочники для каждого типа медиа
     for media_type in config.media_type_full_dict.keys():
@@ -98,7 +98,7 @@ def create_adex_tables():
             for key, value in tables_dict.items():
                 table_name = tables_dict[key][0]
                 vars_list = tables_dict[key][1]
-                createDBTable(config.db_name, table_name, vars_list, flag='create')
+                createDBTable(config.db_name, table_name, vars_list, flag='drop')
 
 # Здесь уникальные справочники которые ТРЕБУЮТ обновления. Например tv_Ad_slogan_audio
         if media_type in config_media_costs.adex_unique_media_dicts:
@@ -106,7 +106,7 @@ def create_adex_tables():
             for key, value in tables_dict.items():
                 table_name = tables_dict[key][0]
                 vars_list = tables_dict[key][1]
-                createDBTable(config.db_name, table_name, vars_list, flag='create')
+                createDBTable(config.db_name, table_name, vars_list, flag='drop')
 
 # Здесь справочники ИД объявлений. Например tv_Ad, tv_Appendix 
         if media_type in config_media_costs.adex_ad_dicts:
@@ -114,11 +114,11 @@ def create_adex_tables():
             for key, value in tables_dict.items():
                 table_name = tables_dict[key][0]
                 vars_list = tables_dict[key][1]
-                createDBTable(config.db_name, table_name, vars_list, flag='create')
+                createDBTable(config.db_name, table_name, vars_list, flag='drop')
 
 # создаем Общие справочники List. Например - BrandList, ModelList, ArticleList2 и тд.
     for key, value in config_media_costs.adex_all_media_list_dicts.items():
-        createDBTable(config.db_name, value[0], value[1], flag='create')
+        createDBTable(config.db_name, value[0], value[1], flag='drop')
 
     # # создаем Общие справочники Level. Например - Brand, Model, Article и тд.
     # for key, value in config_media_costs.adex_all_media_level_dicts.items():
@@ -136,7 +136,7 @@ def create_adex_tables():
 
 
 
-# In[ ]:
+# In[4]:
 
 
 """
@@ -225,7 +225,7 @@ def download_adex_default_dicts():
 
 
 
-# In[ ]:
+# In[5]:
 
 
 """
@@ -277,7 +277,7 @@ def get_adex_tables(mediascope_table, mediascope_fields_name, media_type='', int
 
 
 
-# In[ ]:
+# In[6]:
 
 
 """
@@ -353,7 +353,7 @@ def update_media_ads_dict(media_type):
 
 
 
-# In[ ]:
+# In[7]:
 
 
 """
@@ -419,7 +419,7 @@ def update_another_dicts(media_type):
 
 
 
-# In[ ]:
+# In[8]:
 
 
 """
@@ -477,7 +477,7 @@ def update_list_dicts(media_type):
             print(sep_str)
 
 
-# In[ ]:
+# In[9]:
 
 
 """
@@ -518,7 +518,7 @@ def update_ad_dict_items(media_type):
             downloadTableToDB(config.db_name, table_name, df)
 
 
-# In[ ]:
+# In[10]:
 
 
 """
